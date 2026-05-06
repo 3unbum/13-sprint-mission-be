@@ -1,0 +1,46 @@
+### baseUrl 변수
+@baseUrl = http://localhost:3000
+
+### productId 변수
+@productId = 69fb5bf39f2bca447e95b00c
+
+
+### 상품 등록
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+    "name": "잠자리마우스",
+    "description": "테스트 설명입니다.",
+    "price": 10000,
+    "tags": ["전자제품", "신품"]
+}
+
+### 상품 전체 조회
+GET {{baseUrl}}/products
+
+### 페이지네이션 - offset=2, limit=3
+GET {{baseUrl}}/products?offset=2$limit=3
+
+### 검색 - "테스트"
+GET {{baseUrl}}/products?keyword=테스트
+
+### 검색 + 페이지네이션
+GET {{baseUrl}}/products?keyword=마우스&offset=0&limit=5
+
+### 최신순 정렬 (기본값이라 sort 빼도 동일)
+GET {{baseUrl}}/products?sort=recent
+
+### 상품 상세 조회
+GET {{baseUrl}}/products/{{productId}}
+
+### 상품 수정
+PATCH {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+
+{
+    "price": 10000
+}
+
+### 상품 삭제
+DELETE {{baseUrl}}/products/{{productId}}
