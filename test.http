@@ -1,5 +1,5 @@
 ### baseUrl 변수
-@baseUrl = http://localhost:3000
+@baseUrl = https://pandamarket-be-eunbum.onrender.com
 
 ### productId 변수
 @productId = 69fb5bf39f2bca447e95b00c
@@ -23,7 +23,7 @@ GET {{baseUrl}}/products
 GET {{baseUrl}}/products?offset=2$limit=3
 
 ### 검색 - "테스트"
-GET {{baseUrl}}/products?keyword=테스트
+GET {{baseUrl}}/products?keyword=아이폰
 
 ### 검색 + 페이지네이션
 GET {{baseUrl}}/products?keyword=마우스&offset=0&limit=5
