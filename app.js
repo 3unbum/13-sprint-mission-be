@@ -43,13 +43,15 @@ app.get(
 
     const sortOption = sort === "recent" ? { createdAt: -1 } : {};
 
+    const totalCount = await Product.countDocuments(filter);
+
     const products = await Product.find(filter)
       .sort(sortOption)
       .skip(offset)
       .limit(limit)
       .select("name price createdAt");
 
-    res.json(products);
+    res.json({ list: products, totalCount });
   }),
 );
 
