@@ -6,7 +6,7 @@ export const asyncHandler = (fn) => {
       if (e.name === "ValidationError") {
         res.status(400).json({ message: e.message });
       } else if (e.name === "CastError") {
-        res.status(404).json({ message: "Cannot find given id." });
+        res.status(400).json({ message: "Invalid id format." });
       } else {
         res.status(500).json({ message: e.message });
       }
