@@ -1,46 +1,112 @@
-### baseUrl 변수
-@baseUrl = https://pandamarket-be-eunbum.onrender.com
+// =====================================================
+### 1. 전체 상품 목록 (시드 데이터 10개 확인)
+GET http://localhost:3000/products
 
-### productId 변수
-@productId = 69fb5bf39f2bca447e95b00c
+### 2. 검색 + 페이지네이션
+GET http://localhost:3000/products?keyword=애플&limit=5
 
+### 3. 정렬
+GET http://localhost:3000/products?sort=recent&limit=3
 
-### 상품 등록
-POST {{baseUrl}}/products
+### 4. 단건 조회
+GET http://localhost:3000/products/1
+
+### 5. 존재 안 하는 id (404 응답 확인)
+GET http://localhost:3000/products/999
+
+### 6. 생성
+POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-    "name": "잠자리마우스",
-    "description": "테스트 설명입니다.",
+    "name": "테스트 상품",
+    "description": "API 테스트용",
     "price": 10000,
-    "tags": ["전자제품", "신품"]
+    "tags": ["테스트"]
 }
 
-### 상품 전체 조회
-GET {{baseUrl}}/products
-
-### 페이지네이션 - offset=2, limit=3
-GET {{baseUrl}}/products?offset=2$limit=3
-
-### 검색 - "테스트"
-GET {{baseUrl}}/products?keyword=아이폰
-
-### 검색 + 페이지네이션
-GET {{baseUrl}}/products?keyword=마우스&offset=0&limit=5
-
-### 최신순 정렬 (기본값이라 sort 빼도 동일)
-GET {{baseUrl}}/products?sort=recent
-
-### 상품 상세 조회
-GET {{baseUrl}}/products/{{productId}}
-
-### 상품 수정
-PATCH {{baseUrl}}/products/{{productId}}
+### 7. 수정
+PATCH http://localhost:3000/products/11
 Content-Type: application/json
 
 {
-    "price": 10000
+    "price": 15000
 }
 
-### 상품 삭제
-DELETE {{baseUrl}}/products/{{productId}}
+### 8. 삭제
+DELETE http://localhost:3000/products/11
+
+
+
+// =====================================================
+
+
+###
+GET http://localhost:3000/articles
+
+###
+GET http://localhost:3000/articles/1
+
+###
+POST http://localhost:3000/articles
+Content-Type: application/json
+
+{
+    "title": "테스트 제목",
+    "content": "테스트 내용임 ㅇㅇ"
+}
+
+###
+PATCH http://localhost:3000/articles/11
+Content-Type: application/json
+
+{
+    "content": "사실 뻥임 ㅋㅋ"
+}
+
+###
+DELETE http://localhost:3000/articles/11
+
+
+
+// ===================================================== Comment
+### Product 1번 댓글 등록
+POST http://localhost:3000/products/1/comments
+Content-Type: application/json
+
+{
+    "content":"이 상품 가격 협상 가능한가요??"
+}
+
+### Product 1번 댓글 목록 (첫 페이지, limit 3)
+GET http://localhost:3000/products/1/comments?limit=3
+
+### Product 1번 댓글 목록 (다음 페이지, 위 응답의 nextCursor 값 사용)
+GET http://localhost:3000/products/1/comments?limit=3&cursor=2
+
+### Article 1번 댓글 등록
+POST http://localhost:3000/articles/1/comments
+Content-Type: application/json
+
+{
+    "content": "공감합니다!"
+}
+
+### Article 1번 댓글 목록
+GET http://localhost:3000/articles/1/comments
+
+### 댓글 수정
+PATCH http://localhost:3000/comments/1
+Content-Type: application/json
+
+{
+    "content": "수정된 댓글 내용입니다."
+}
+
+### 댓글 삭제
+DELETE http://localhost:3000/comments/1
+
+### Cascade 테스트: Product 삭제 -> 해당 댓글들도 자동 삭제 확인
+DELETE http://localhost:3000/products/1
+### 이후 Product 1의 댓글 조회 시 빈 배열이어야 함
+GET http://localhost:3000/products/1/comments
