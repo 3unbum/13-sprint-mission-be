@@ -3,6 +3,16 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // 안전장치 : 이 스크립트는 TRUNCATE로 모든 데이터를 지운다.
+  // production DB(예: render)에서 실수로 돌면 큰 사고가 나므로,
+  // DATABASE_URL이 로컬 DB(localhost/127.0.0.1)를 가리킬 때만 실행을 허용한다.
+  const dbUrl = process.env.DATABASE_URL || "";
+  const isLocal = /@(localhost|127\.0\.0\.1)[:/]/.test(dbUrl);
+  if (!isLocal) {
+    throw new Error(
+      "시드는 로컬 DB에서만 실행할 수 있어요. DATABASE_URL이 localhost인지 확인하세요.",
+    );
+  }
   await prisma.$executeRaw`TRUNCATE TABLE "products", "articles", "comments" RESTART IDENTITY CASCADE`;
 
   // 2. Product 생성 (중고마켓)

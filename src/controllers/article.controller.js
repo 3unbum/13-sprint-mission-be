@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { parseId } from "../utils/parseId.js";
 
 // --- Create ---
 export const createArticle = asyncHandler(async (req, res) => {
@@ -56,7 +57,7 @@ export const getArticleList = asyncHandler(async (req, res) => {
 
 // --- Read: 단건 ---
 export const getArticle = asyncHandler(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
   const article = await prisma.article.findUnique({
     where: { id },
   });
@@ -68,7 +69,7 @@ export const getArticle = asyncHandler(async (req, res) => {
 
 // --- Update ---
 export const updateArticle = asyncHandler(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
 
   // 존재 확인
   const existing = await prisma.article.findUnique({ where: { id } });
@@ -87,7 +88,7 @@ export const updateArticle = asyncHandler(async (req, res) => {
 
 // --- Delete ---
 export const deleteArticle = asyncHandler(async (req, res) => {
-  const id = Number(req.params.id);
+  const id = parseId(req.params.id);
 
   // 존재 확인
   const existing = await prisma.article.findUnique({ where: { id } });
