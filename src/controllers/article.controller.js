@@ -16,7 +16,7 @@ export const getArticleList = asyncHandler(async (req, res) => {
   // 쿼리 파라미터 검증
   const offset = Math.max(0, parseInt(req.query.offset) || 0);
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
-  const sortWhitelist = ["recent"];
+  const sortWhitelist = ["recent", "oldest"];
   const sort = sortWhitelist.includes(req.query.sort)
     ? req.query.sort
     : "recent";
@@ -33,7 +33,8 @@ export const getArticleList = asyncHandler(async (req, res) => {
     : {};
 
   // 정렬
-  const orderBy = sort === "recent" ? { createdAt: "desc" } : {};
+  const orderBy =
+    sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" };
 
   // 병렬 조회
   const [totalCount, list] = await Promise.all([
