@@ -1,0 +1,76 @@
+### 판다마켓 API 테스트 (VS Code REST Client 확장 필요)
+### 각 요청 위의 "Send Request" 를 누르면 실행됩니다.
+### @변수는 아래에서 재사용됩니다.
+
+@baseUrl = http://localhost:4000
+
+### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
+### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
+@accessToken = 여기에_accessToken_붙여넣기
+
+
+############################################
+# 헬스체크
+############################################
+
+### 서버 살아있나
+GET {{baseUrl}}/
+
+
+############################################
+# 인증 (Auth)
+############################################
+
+### ① 회원가입 (성공 시 201 + accessToken/refreshToken/user)
+POST {{baseUrl}}/auth/signUp
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "nickname": "판다",
+  "password": "12345678",
+  "passwordConfirmation": "12345678"
+}
+
+### ② 로그인 (성공 시 200 + accessToken/refreshToken/user)
+# 응답의 accessToken 을 위쪽 @accessToken 변수에 복사해두면 편해요.
+POST {{baseUrl}}/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "password": "12345678"
+}
+
+### ③ 내 정보 조회 (토큰 필요 · 성공 시 200 + user)
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{accessToken}}
+
+
+############################################
+# 에러 케이스 확인용
+############################################
+
+### ④ 틀린 비밀번호 로그인 → 401 기대
+POST {{baseUrl}}/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "password": "wrong-password"
+}
+
+### ⑤ 중복 이메일 회원가입 → 422 기대
+# (①을 먼저 실행해 같은 이메일이 이미 있는 상태에서 실행)
+POST {{baseUrl}}/auth/signUp
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "nickname": "판다2",
+  "password": "12345678",
+  "passwordConfirmation": "12345678"
+}
+
+### ⑥ 토큰 없이 내 정보 조회 → 401 기대
+GET {{baseUrl}}/users/me
