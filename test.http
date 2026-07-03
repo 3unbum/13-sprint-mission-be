@@ -6,7 +6,7 @@
 
 ### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
 ### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
-@accessToken = 여기에_accessToken_붙여넣기
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzA1MjAwNSwiZXhwIjoxNzgzMDU1NjA1fQ.M6Gw_BHX76YJqJ_E9iaCDcUD17JMQ-EAeyZ5cdQbpw4
 
 
 ############################################
@@ -74,3 +74,58 @@ Content-Type: application/json
 
 ### ⑥ 토큰 없이 내 정보 조회 → 401 기대
 GET {{baseUrl}}/users/me
+
+
+############################################
+# 상품 (Products)
+############################################
+
+### ⑦ 상품 등록 (토큰 필요, 201)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "아이패드 미니 6",
+  "description": "깨끗하게 썼어요. 풀박스입니다.",
+  "price": 500000,
+  "tags": ["전자제품", "애플"],
+  "images": []
+}
+
+### ⑧ 상품 목록 (비로그인 OK, {list, totalCount})
+GET {{baseUrl}}/products?page=1&pageSize=10&orderBy=recent
+
+### ⑨ 상품 목록 — 좋아요순 + 검색
+GET {{baseUrl}}/products?orderBy=favorite&keyword=아이패드
+
+### ⑩ 상품 상세 (토큰 필요, 댓글리스트 + isFavorite 포함)
+GET {{baseUrl}}/products/1
+Authorization: Bearer {{accessToken}}
+
+### ⑪ 상품 수정 (작성자만, 아니면 403)
+PATCH {{baseUrl}}/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "price": 450000
+}
+
+### ⑫ 상품 삭제 (작성자만, 204)
+DELETE {{baseUrl}}/products/3
+Authorization: Bearer {{accessToken}}
+
+### ⑬ 에러 확인 — 없는 상품 (404)
+GET {{baseUrl}}/products/9999
+Authorization: Bearer {{accessToken}}
+
+### ⑭ 에러 확인 — 토큰 없이 등록 (401)
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "몰래 등록",
+  "description": "안 되죠",
+  "price": 1000
+}

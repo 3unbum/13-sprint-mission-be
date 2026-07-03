@@ -4,6 +4,7 @@ import "dotenv/config";
 
 import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
+import productRouter from "./routes/productRouter.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 // ── 라우터 ─────────────────────────────
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
+app.use("/products", productRouter);
 
 // ── 에러 핸들러 (모든 라우터 뒤에 위치) ─
 // 매개변수 4개(err, req, res, next)여야 Express가 에러 핸들러로 인식한다.
