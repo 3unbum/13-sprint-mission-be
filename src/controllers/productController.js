@@ -63,3 +63,17 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   await productService.deleteProduct(id, req.auth.userId);
   res.status(204).send();
 });
+
+// POST /products/:id/favorite
+export const addFavorite = asyncHandler(async (req, res) => {
+  const id = parseId(req.params);
+  const product = await productService.addFavorite(id, req.auth.userId);
+  res.status(201).json(product);
+});
+
+// DELETE /products/:id/favorite
+export const removeFavorite = asyncHandler(async (req, res) => {
+  const id = parseId(req.params);
+  const product = await productService.removeFavorite(id, req.auth.userId);
+  res.json(product);
+});

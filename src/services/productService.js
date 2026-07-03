@@ -95,3 +95,37 @@ export async function deleteProduct(id, userId) {
   await checkOwner(id, userId);
   await productRepository.remove(id);
 }
+
+// 좋아요 추가 (없는 상품 404, 이미 누른 상품 409)
+export async function addFavorite(productId, userId) {
+  const product = await productRepository.findById(productId, userId);
+  if (!product) {
+    const error = new Error("상품을 찾을 수 없어요.");
+    error.status = 404;
+    throw error;
+  }
+  if (product.likes.length > 0) {
+    const error = new Error("이미 좋아요를 누른 상품이에요.");
+    error.status = 409;
+    throw error;
+  }
+  const updated = await productRepository.addLike(productId, userId);
+  return toProductResponse(updated);
+}
+
+// 좋아요 취소 (없는 상품 404, 안 누른 상품 409)
+export async function removeFavorite(productId, userId) {
+  const product = await productRepository.findById(productId, userId);
+  if (!product) {
+    const error = new Error("상품을 찾을 수 없어요.");
+    error.status = 404;
+    throw error;
+  }
+  if (product.likes.length === 0) {
+    const error = new Error("좋아요를 누르지 않은 상품이에요.");
+    error.status = 409;
+    throw error;
+  }
+  const updated = await productRepository.removeLike(productId, userId);
+  return toProductResponse(updated);
+}

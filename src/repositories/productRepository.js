@@ -63,3 +63,36 @@ export async function update(id, userId, data) {
 export async function remove(id) {
   return prisma.product.delete({ where: { id } });
 }
+
+// 좋아요 이후의 최신 상품 조회용 include (내 좋아요 여부 포함)
+function favoriteInclude(userId) {
+  return {
+    ...baseInclude,
+    likes: { where: { userId }, select: { id: true } },
+  };
+}
+
+// 좋아요 추가 + 갱신된 상품 조회를 하나의 트랜잭션으로
+// (배열 형태 $transaction: 순서대로 실행되고, 하나라도 실패하면 전부 롤백)
+export async function addLike(productId, userId) {
+  const [, product] = await prisma.$transaction([
+    prisma.like.create({ data: { productId, userId } }),
+    prisma.product.findUnique({
+      where: { id: productId },
+      include: favoriteInclude(userId),
+    }),
+  ]);
+  return product;
+}
+
+// 좋아요 취소 + 갱신된 상품 조회 (트랜잭션)
+export async function removeLike(productId, userId) {
+  const [, product] = await prisma.$transaction([
+    prisma.like.deleteMany({ where: { productId, userId } }),
+    prisma.product.findUnique({
+      where: { id: productId },
+      include: favoriteInclude(userId),
+    }),
+  ]);
+  return product;
+}

@@ -6,7 +6,7 @@
 
 ### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
 ### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzA3MjQ3NywiZXhwIjoxNzgzMDc2MDc3fQ.dX3ND1Fcj8Hu9LDqxNf8MBkB7bHLjSHyDVPjxmdgVG0
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzEwNDE2OSwiZXhwIjoxNzgzMTA3NzY5fQ.cRTYoVDZM27LPCtmb7Awv7zaJ7pBP5X2-yocHg428A4
 
 
 ############################################
@@ -188,3 +188,24 @@ dummy
 ------TestBoundary--
 
 ---
+
+
+
+### ⑳ 좋아요 추가 (201, isFavorite: true, favoriteCount +1)
+POST {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+### ㉑ 좋아요 중복 추가 (409)
+POST {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+### ㉒ 좋아요 순 정렬 확인 (좋아요 누른 상품이 맨 앞으로)
+GET {{baseUrl}}/products?orderBy=favorite
+
+### ㉓ 좋아요 취소 (200, isFavorite: false)
+DELETE {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+### ㉔ 안 누른 상태에서 취소 (409)
+DELETE {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}

@@ -26,4 +26,9 @@ router
   )
   .delete(verifyAccessToken, productController.deleteProduct);
 
+router
+  .route("/:id/favorite")
+  .post(verifyAccessToken, productController.addFavorite)
+  .delete(verifyAccessToken, productController.removeFavorite);
+
 export default router;
