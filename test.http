@@ -6,7 +6,7 @@
 
 ### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
 ### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzA1MjAwNSwiZXhwIjoxNzgzMDU1NjA1fQ.M6Gw_BHX76YJqJ_E9iaCDcUD17JMQ-EAeyZ5cdQbpw4
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzA2ODIzOSwiZXhwIjoxNzgzMDcxODM5fQ.MdMwWb0-O9DEYitOJUFmXDlLCeS0CWG63Vc3vlisGuo
 
 
 ############################################
@@ -128,4 +128,37 @@ Content-Type: application/json
   "name": "몰래 등록",
   "description": "안 되죠",
   "price": 1000
+}
+
+
+
+### ⑮ 검증 에러 — price 누락 (400)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "가격 없는 상품",
+  "description": "400이 떠야 해요"
+}
+
+### ⑯ 검증 에러 — 이미지 4개 초과 (400)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "이미지 과다",
+  "description": "최대 3개까지만",
+  "price": 1000,
+  "images": ["a.png", "b.png", "c.png", "d.png"]
+}
+
+### ⑰ 검증 에러 — 수정 시 price에 문자열 (400)
+PATCH {{baseUrl}}/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "price": "공짜"
 }

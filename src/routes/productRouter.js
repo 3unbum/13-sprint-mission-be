@@ -1,6 +1,8 @@
 import express from "express";
 import * as productController from "../controllers/productController.js";
 import { verifyAccessToken } from "../middlewares/auth.js";
+import { validateBody } from "../middlewares/validate.js";
+import { CreateProduct, UpdateProduct } from "../structs/productStructs.js";
 
 const router = express.Router();
 
@@ -8,12 +10,20 @@ const router = express.Router();
 router
   .route("/")
   .get(productController.getProducts) // 목록은 비로그인도 조회 가능
-  .post(verifyAccessToken, productController.createProduct);
+  .post(
+    verifyAccessToken,
+    validateBody(CreateProduct),
+    productController.createProduct,
+  );
 
 router
   .route("/:id")
   .get(verifyAccessToken, productController.getProduct)
-  .patch(verifyAccessToken, productController.updateProduct)
+  .patch(
+    verifyAccessToken,
+    validateBody(UpdateProduct),
+    productController.updateProduct,
+  )
   .delete(verifyAccessToken, productController.deleteProduct);
 
 export default router;
