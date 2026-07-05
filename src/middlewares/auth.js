@@ -7,3 +7,11 @@ export const verifyAccessToken = expressjwt({
   secret: process.env.JWT_SECRET,
   algorithms: ["HS256"],
 });
+
+// 토큰이 있으면 검증해 req.auth를 채우고, 없어도 통과 (공개 조회용)
+// 비로그인이면 req.auth === undefined
+export const optionalAuth = expressjwt({
+  secret: process.env.JWT_SECRET,
+  algorithms: ["HS256"],
+  credentialsRequired: false,
+});

@@ -56,3 +56,29 @@ export const deleteComment = asyncHandler(async (req, res) => {
   await commentService.deleteComment(id, req.auth.userId);
   res.status(204).send();
 });
+
+// GET /articles/:id/comments (비로그인 공개)
+export const getArticleComments = asyncHandler(async (req, res) => {
+  const articleId = parseId(req.params.id, "게시글 id");
+  const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50);
+  const cursor = req.query.cursor
+    ? parseId(req.query.cursor, "cursor")
+    : undefined;
+
+  const result = await commentService.getArticleComments(articleId, {
+    cursor,
+    limit,
+  });
+  res.json(result);
+});
+
+// POST /articles/:id/comments
+export const createArticleComment = asyncHandler(async (req, res) => {
+  const articleId = parseId(req.params.id, "게시글 id");
+  const comment = await commentService.createArticleComment(
+    articleId,
+    req.auth.userId,
+    req.body.content,
+  );
+  res.status(201).json(comment);
+});

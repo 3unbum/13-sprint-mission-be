@@ -1,5 +1,6 @@
 import * as commentRepository from "../repositories/commentRepository.js";
 import * as productRepository from "../repositories/productRepository.js";
+import * as articleRepository from "../repositories/articleRepository.js";
 
 // user -> writer로 이름만 바꿔 프론트 형태로
 function toCommentResponse(comment) {
@@ -34,7 +35,7 @@ async function checkWriter(id, userId) {
 
 export async function getProductComments(productId, userId, { cursor, limit }) {
   await ensureProduct(productId, userId);
-  const comments = await commentRepository.findManyByProduct(productId, {
+  const comment = await commentRepository.findManyByProduct(productId, {
     cursor,
     limit,
   });
@@ -63,4 +64,35 @@ export async function updateComment(id, userId, content) {
 export async function deleteComment(id, userId) {
   await checkWriter(id, userId);
   await commentRepository.remove(id);
+}
+
+// 게시글 존재 확인 (404)
+async function ensureArticle(articleId) {
+  const article = await articleRepository.findById(articleId, null);
+  if (!article) {
+    const error = new Error("게시글을 찾을 수 없어요.");
+    error.status = 404;
+    throw error;
+  }
+}
+
+export async function getArticleComments(articleId, { cursor, limit }) {
+  await ensureArticle(articleId);
+  const comments = await commentRepository.findManyByArticle(articleId, {
+    cursor,
+    limit,
+  });
+  const list = comments.map(toCommentResponse);
+  const nextCursor = list.length === limit ? list[list.length - 1].id : null;
+  return { list, nextCursor };
+}
+
+export async function createArticleComment(articleId, userId, content) {
+  await ensureArticle(articleId);
+  const comment = await commentRepository.create({
+    content,
+    articleId,
+    userId,
+  });
+  return toCommentResponse(comment);
 }

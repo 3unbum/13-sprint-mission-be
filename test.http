@@ -6,7 +6,7 @@
 
 ### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
 ### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzIyOTA1MywiZXhwIjoxNzgzMjMyNjUzfQ.e95CzHB54XHCFtVRzJ5CN3UHqG68p0Ylt3QoZJmEHek
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzI0MjA2MywiZXhwIjoxNzgzMjQ1NjYzfQ.at3E67mQIWDyn554_VUP-IwBxXJcpzq39loIYkNZyOc
 
 
 ############################################
@@ -249,3 +249,57 @@ Authorization: Bearer {{accessToken}}
 {
   "content": ""
 }
+
+
+############################################
+# 게시글 (Articles)
+############################################
+
+### ㉚ 게시글 등록 (201)
+POST {{baseUrl}}/articles
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "첫 게시글이에요",
+  "content": "자유게시판 테스트 글입니다."
+}
+
+### ㉛ 게시글 목록 (비로그인 OK, likeCount/nickname 확인)
+GET {{baseUrl}}/articles?page=1&pageSize=10&orderBy=recent
+
+### ㉜ 게시글 상세 (비로그인 → isLiked: false)
+GET {{baseUrl}}/articles/3
+
+### ㉝ 게시글 수정 (작성자만)
+PATCH {{baseUrl}}/articles/3
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "수정된 제목123"
+}
+
+### ㉞ 게시글 좋아요 (201, likeCount +1, isLiked: true)
+POST {{baseUrl}}/articles/3/like
+Authorization: Bearer {{accessToken}}
+
+### ㉟ 게시글 좋아요 취소 (200, isLiked: false)
+DELETE {{baseUrl}}/articles/3/like
+Authorization: Bearer {{accessToken}}
+
+### ㊱ 게시글 댓글 등록 (201)
+POST {{baseUrl}}/articles/3/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": "게시글 댓글이에요"
+}
+
+### ㊲ 게시글 댓글 목록 (비로그인 OK)
+GET {{baseUrl}}/articles/3/comments?limit=10
+
+### ㊳ 게시글 삭제 (작성자만, 204)
+DELETE {{baseUrl}}/articles/3
+Authorization: Bearer {{accessToken}}
