@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./docs/swagger.js";
 
 import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
@@ -32,6 +34,7 @@ app.use("/products", productRouter);
 app.use("/images", imageRouter);
 app.use("/comments", commentRouter);
 app.use("/articles", articleRouter);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ── 에러 핸들러 (모든 라우터 뒤에 위치) ─
 // 매개변수 4개(err, req, res, next)여야 Express가 에러 핸들러로 인식한다.
