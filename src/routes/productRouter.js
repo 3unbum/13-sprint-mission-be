@@ -3,6 +3,8 @@ import * as productController from "../controllers/productController.js";
 import { verifyAccessToken } from "../middlewares/auth.js";
 import { validateBody } from "../middlewares/validate.js";
 import { CreateProduct, UpdateProduct } from "../structs/productStructs.js";
+import * as commentController from "../controllers/commentController.js";
+import { CreateComment } from "../structs/commentStructs.js";
 
 const router = express.Router();
 
@@ -30,5 +32,14 @@ router
   .route("/:id/favorite")
   .post(verifyAccessToken, productController.addFavorite)
   .delete(verifyAccessToken, productController.removeFavorite);
+
+router
+  .route("/:id/comments")
+  .get(verifyAccessToken, commentController.getProductComments)
+  .post(
+    verifyAccessToken,
+    validateBody(CreateComment),
+    commentController.createProductComment,
+  );
 
 export default router;

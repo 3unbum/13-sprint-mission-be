@@ -6,6 +6,7 @@ import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
 import productRouter from "./routes/productRouter.js";
 import imageRouter from "./routes/imageRouter.js";
+import commentRouter from "./routes/commentRouter.js";
 
 const app = express();
 
@@ -28,15 +29,16 @@ app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/products", productRouter);
 app.use("/images", imageRouter);
+app.use("/comments", commentRouter);
 
 // ── 에러 핸들러 (모든 라우터 뒤에 위치) ─
 // 매개변수 4개(err, req, res, next)여야 Express가 에러 핸들러로 인식한다.
 app.use((err, req, res, next) => {
   console.log(err);
-  if(err.name === "MulterError"){
-    return res
-      .status(400)
-      .json({ message: "파일 업로드에 실패했어요. (5MB 이하 이미지만 가능해요)"})
+  if (err.name === "MulterError") {
+    return res.status(400).json({
+      message: "파일 업로드에 실패했어요. (5MB 이하 이미지만 가능해요)",
+    });
   }
   const status = err.status ?? 500;
   res.status(status).json({

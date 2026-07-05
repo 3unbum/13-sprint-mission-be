@@ -6,7 +6,7 @@
 
 ### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
 ### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzEwNDE2OSwiZXhwIjoxNzgzMTA3NzY5fQ.cRTYoVDZM27LPCtmb7Awv7zaJ7pBP5X2-yocHg428A4
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzIyOTA1MywiZXhwIjoxNzgzMjMyNjUzfQ.e95CzHB54XHCFtVRzJ5CN3UHqG68p0Ylt3QoZJmEHek
 
 
 ############################################
@@ -209,3 +209,43 @@ Authorization: Bearer {{accessToken}}
 ### ㉔ 안 누른 상태에서 취소 (409)
 DELETE {{baseUrl}}/products/5/favorite
 Authorization: Bearer {{accessToken}}
+
+
+############################################
+# 댓글 (Comments)
+############################################
+
+### ㉕ 댓글 등록 (201 + writer 포함)
+POST {{baseUrl}}/products/5/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": "이 상품 아직 판매하나요?"
+}
+
+### ㉖ 댓글 목록 ({list, nextCursor})
+GET {{baseUrl}}/products/5/comments?limit=10
+Authorization: Bearer {{accessToken}}
+
+### ㉗ 댓글 수정 (작성자만)
+PATCH {{baseUrl}}/comments/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": "가격 조금 깎아주실 수 있나요?"
+}
+
+### ㉘ 댓글 삭제 (작성자만, 204)
+DELETE {{baseUrl}}/comments/1
+Authorization: Bearer {{accessToken}}
+
+### ㉙ 검증 에러 — 빈 댓글 (400)
+POST {{baseUrl}}/products/5/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": ""
+}
