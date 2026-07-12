@@ -35,7 +35,7 @@ async function checkWriter(id, userId) {
 
 export async function getProductComments(productId, userId, { cursor, limit }) {
   await ensureProduct(productId, userId);
-  const comment = await commentRepository.findManyByProduct(productId, {
+  const comments = await commentRepository.findManyByProduct(productId, {
     cursor,
     limit,
   });
