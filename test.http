@@ -1,0 +1,305 @@
+### 판다마켓 API 테스트 (VS Code REST Client 확장 필요)
+### 각 요청 위의 "Send Request" 를 누르면 실행됩니다.
+### @변수는 아래에서 재사용됩니다.
+
+@baseUrl = http://localhost:4000
+
+### 로그인/회원가입 성공 응답의 accessToken 을 여기에 붙여넣으면
+### 아래 인증 필요한 요청들에서 자동으로 쓰입니다.
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc4MzI0MjA2MywiZXhwIjoxNzgzMjQ1NjYzfQ.at3E67mQIWDyn554_VUP-IwBxXJcpzq39loIYkNZyOc
+
+
+############################################
+# 헬스체크
+############################################
+
+### 서버 살아있나
+GET {{baseUrl}}/
+
+
+############################################
+# 인증 (Auth)
+############################################
+
+### ① 회원가입 (성공 시 201 + accessToken/refreshToken/user)
+POST {{baseUrl}}/auth/signUp
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "nickname": "판다",
+  "password": "12345678",
+  "passwordConfirmation": "12345678"
+}
+
+### ② 로그인 (성공 시 200 + accessToken/refreshToken/user)
+# 응답의 accessToken 을 위쪽 @accessToken 변수에 복사해두면 편해요.
+POST {{baseUrl}}/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "password": "12345678"
+}
+
+### ③ 내 정보 조회 (토큰 필요 · 성공 시 200 + user)
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{accessToken}}
+
+
+############################################
+# 에러 케이스 확인용
+############################################
+
+### ④ 틀린 비밀번호 로그인 → 401 기대
+POST {{baseUrl}}/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "password": "wrong-password"
+}
+
+### ⑤ 중복 이메일 회원가입 → 422 기대
+# (①을 먼저 실행해 같은 이메일이 이미 있는 상태에서 실행)
+POST {{baseUrl}}/auth/signUp
+Content-Type: application/json
+
+{
+  "email": "codeit@test.com",
+  "nickname": "판다2",
+  "password": "12345678",
+  "passwordConfirmation": "12345678"
+}
+
+### ⑥ 토큰 없이 내 정보 조회 → 401 기대
+GET {{baseUrl}}/users/me
+
+
+############################################
+# 상품 (Products)
+############################################
+
+### ⑦ 상품 등록 (토큰 필요, 201)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "아이패드 미니 6",
+  "description": "깨끗하게 썼어요. 풀박스입니다.",
+  "price": 500000,
+  "tags": ["전자제품", "애플"],
+  "images": []
+}
+
+### ⑧ 상품 목록 (비로그인 OK, {list, totalCount})
+GET {{baseUrl}}/products?page=1&pageSize=10&orderBy=recent
+
+### ⑨ 상품 목록 — 좋아요순 + 검색
+GET {{baseUrl}}/products?orderBy=favorite&keyword=아이패드
+
+### ⑩ 상품 상세 (토큰 필요, 댓글리스트 + isFavorite 포함)
+GET {{baseUrl}}/products/1
+Authorization: Bearer {{accessToken}}
+
+### ⑪ 상품 수정 (작성자만, 아니면 403)
+PATCH {{baseUrl}}/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "price": 450000
+}
+
+### ⑫ 상품 삭제 (작성자만, 204)
+DELETE {{baseUrl}}/products/3
+Authorization: Bearer {{accessToken}}
+
+### ⑬ 에러 확인 — 없는 상품 (404)
+GET {{baseUrl}}/products/9999
+Authorization: Bearer {{accessToken}}
+
+### ⑭ 에러 확인 — 토큰 없이 등록 (401)
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "몰래 등록",
+  "description": "안 되죠",
+  "price": 1000
+}
+
+
+
+### ⑮ 검증 에러 — price 누락 (400)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "가격 없는 상품",
+  "description": "400이 떠야 해요"
+}
+
+### ⑯ 검증 에러 — 이미지 4개 초과 (400)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "이미지 과다",
+  "description": "최대 3개까지만",
+  "price": 1000,
+  "images": ["a.png", "b.png", "c.png", "d.png"]
+}
+
+### ⑰ 검증 에러 — 수정 시 price에 문자열 (400)
+PATCH {{baseUrl}}/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "price": "공짜"
+}
+
+
+### ⑱ 이미지 업로드 (토큰 필요, 201 + {url})
+POST {{baseUrl}}/images/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----TestBoundary
+
+------TestBoundary
+Content-Disposition: form-data; name="image"; filename="test-image.png"
+Content-Type: image/png
+
+< ./test-image.png
+------TestBoundary--
+
+### ⑲ 업로드 에러 — 파일 없이 요청 (400)
+POST {{baseUrl}}/images/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----TestBoundary
+
+------TestBoundary
+Content-Disposition: form-data; name="wrong-field"
+
+dummy
+------TestBoundary--
+
+---
+
+
+
+### ⑳ 좋아요 추가 (201, isFavorite: true, favoriteCount +1)
+POST {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+### ㉑ 좋아요 중복 추가 (409)
+POST {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+### ㉒ 좋아요 순 정렬 확인 (좋아요 누른 상품이 맨 앞으로)
+GET {{baseUrl}}/products?orderBy=favorite
+
+### ㉓ 좋아요 취소 (200, isFavorite: false)
+DELETE {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+### ㉔ 안 누른 상태에서 취소 (409)
+DELETE {{baseUrl}}/products/5/favorite
+Authorization: Bearer {{accessToken}}
+
+
+############################################
+# 댓글 (Comments)
+############################################
+
+### ㉕ 댓글 등록 (201 + writer 포함)
+POST {{baseUrl}}/products/5/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": "이 상품 아직 판매하나요?"
+}
+
+### ㉖ 댓글 목록 ({list, nextCursor})
+GET {{baseUrl}}/products/5/comments?limit=10
+Authorization: Bearer {{accessToken}}
+
+### ㉗ 댓글 수정 (작성자만)
+PATCH {{baseUrl}}/comments/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": "가격 조금 깎아주실 수 있나요?"
+}
+
+### ㉘ 댓글 삭제 (작성자만, 204)
+DELETE {{baseUrl}}/comments/1
+Authorization: Bearer {{accessToken}}
+
+### ㉙ 검증 에러 — 빈 댓글 (400)
+POST {{baseUrl}}/products/5/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": ""
+}
+
+
+############################################
+# 게시글 (Articles)
+############################################
+
+### ㉚ 게시글 등록 (201)
+POST {{baseUrl}}/articles
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "첫 게시글이에요",
+  "content": "자유게시판 테스트 글입니다."
+}
+
+### ㉛ 게시글 목록 (비로그인 OK, likeCount/nickname 확인)
+GET {{baseUrl}}/articles?page=1&pageSize=10&orderBy=recent
+
+### ㉜ 게시글 상세 (비로그인 → isLiked: false)
+GET {{baseUrl}}/articles/3
+
+### ㉝ 게시글 수정 (작성자만)
+PATCH {{baseUrl}}/articles/3
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "수정된 제목123"
+}
+
+### ㉞ 게시글 좋아요 (201, likeCount +1, isLiked: true)
+POST {{baseUrl}}/articles/3/like
+Authorization: Bearer {{accessToken}}
+
+### ㉟ 게시글 좋아요 취소 (200, isLiked: false)
+DELETE {{baseUrl}}/articles/3/like
+Authorization: Bearer {{accessToken}}
+
+### ㊱ 게시글 댓글 등록 (201)
+POST {{baseUrl}}/articles/3/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "content": "게시글 댓글이에요"
+}
+
+### ㊲ 게시글 댓글 목록 (비로그인 OK)
+GET {{baseUrl}}/articles/3/comments?limit=10
+
+### ㊳ 게시글 삭제 (작성자만, 204)
+DELETE {{baseUrl}}/articles/3
+Authorization: Bearer {{accessToken}}

@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── 유저 ──────────────────────────────
+model User {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique
+  nickname          String
+  image             String? // 프로필 이미지 (선택)
+  encryptedPassword String   @map("encrypted_password") // bcrypt 해시
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // 이 유저가 작성한 것들 / 누른 좋아요
+  products Product[]
+  articles Article[]
+  comments Comment[]
+  likes    Like[]
+
+  @@map("users")
+}
+
+// ── 상품 (중고마켓) ───────────────────
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  tags        String[] // 태그 배열
+  images      String[] // 상품 이미지 최대 3개
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // 작성자 (인가: 작성자만 수정•삭제)
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+  likes    Like[]
+
+  @@map("products")
+}
+
+// ── 게시글 (자유게시판) ───────────────
+model Article {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  image     String? // 게시글 대표 이미지 (선택)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+  likes    Like[]
+
+  @@map("articles")
+}
+
+// ── 댓글 (폴리모픽: 상품 또는 게시글) ──
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 둘 중 하나에만 연결
+  productId Int?     @map("product_id")
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  articleId Int?     @map("article_id")
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  // cursor 페이지네이션용 복합 인덱스
+  @@index([productId, id])
+  @@index([articleId, id])
+  @@map("comments")
+}
+
+// ── 좋아요 (폴리모픽: 상품 또는 게시글) ─
+model Like {
+  id       Int      @id @default(autoincrement())
+  createAt DateTime @default(now()) @map("created_at")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId Int?     @map("product_id")
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  articleId Int?     @map("article_id")
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  // 한 유저가 같은 상품/게시글에 좋아요 1번만 (중복 방지)
+  @@unique([userId, productId])
+  @@unique([userId, articleId])
+  @@map("likes")
+}
