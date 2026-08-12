@@ -22,7 +22,7 @@ export const getProductComments = asyncHandler(async (req, res) => {
 
   const result = await commentService.getProductComments(
     productId,
-    req.auth.userId,
+    req.auth?.userId ?? null,
     { cursor, limit },
   );
   res.json(result);

@@ -34,7 +34,8 @@ export async function findById(id, userId) {
     where: { id },
     include: {
       ...baseInclude,
-      likes: { where: { userId }, select: { id: true } },
+      // userId가 undefined면 Prisma가 "조건 없음"으로 해석해 남의 좋아요까지 가져온다
+      likes: userId ? { where: { userId }, select: { id: true } } : false,
       comments: {
         orderBy: { id: "desc" },
         include: {

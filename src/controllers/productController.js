@@ -36,7 +36,7 @@ export const getProducts = asyncHandler(async (req, res) => {
 // GET /products/:id
 export const getProduct = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const product = await productService.getProduct(id, req.auth.userId);
+  const product = await productService.getProduct(id, req.auth?.userId ?? null);
   res.json(product);
 });
 
