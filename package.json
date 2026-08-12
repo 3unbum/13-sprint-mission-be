@@ -2,10 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon src/app.js",
-    "start": "node src/app.js",
+    "dev": "tsx watch src/app.ts",
+    "build": "tsc",
+    "start": "node --enable-source-maps dist/app.js",
+    "typecheck:watch": "tsc --noEmit --watch",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "studio": "prisma studio",
@@ -18,7 +20,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/3unbum/13-sprint-mission-be/issues"
   },
@@ -36,7 +37,15 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "prisma": "^6.19.3"
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^26.2.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "prisma": "^6.19.3",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.3"
   }
 }
