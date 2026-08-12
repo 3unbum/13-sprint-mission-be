@@ -22,11 +22,11 @@ function createToken(user, type = "access") {
 
 // 회원가입
 export async function signUp({ email, nickname, password }) {
-  // 이메일 중복 체크
+  // 이메일 중복 체크 (409 Conflict - 현재 리소스 상태와 충돌)
   const existing = await userRepository.findByEmail(email);
   if (existing) {
     const error = new Error("이미 사용 중인 이메일이에요.");
-    error.status = 422;
+    error.status = 409;
     throw error;
   }
 

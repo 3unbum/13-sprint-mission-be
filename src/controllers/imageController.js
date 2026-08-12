@@ -7,7 +7,9 @@ export const uploadImage = asyncHandler(async (req, res) => {
     error.status = 400;
     throw error;
   }
-  // app.js의 express.static("/uploads")로 접근 가능한 URL을 만들어 반환
-  const url = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+  // 배포 환경에선 req.get("host")가 내부 호스트로 잡힐 수 있어 환경변수로 고정
+  const baseUrl =
+    process.env.SERVER_URL ?? `${req.protocol}://${req.get("host")}`;
+  const url = `${baseUrl}/uploads/${req.file.filename}`;
   res.status(201).json({ url });
 });

@@ -90,8 +90,8 @@ model Comment {
 
 // ── 좋아요 (폴리모픽: 상품 또는 게시글) ─
 model Like {
-  id       Int      @id @default(autoincrement())
-  createAt DateTime @default(now()) @map("created_at")
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
 
   userId Int  @map("user_id")
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
