@@ -1,27 +1,34 @@
 import * as articleService from "../services/articleService.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler";
+import { BadRequestError } from "../types/errors";
 
-function parseId(params) {
+function parseId(params: { id?: string }): number {
   const id = Number(params.id);
   if (!Number.isInteger(id) || id < 1) {
-    const error = new Error("올바르지 않은 게시글 id예요.");
-    error.status = 400;
-    throw error;
+    throw new BadRequestError("올바르지 않은 게시글 id예요.");
   }
   return id;
 }
 
+interface ArticleListQuery {
+  page?: string;
+  pageSize?: string;
+  orderBy?: string;
+  keyword?: string;
+}
+
 // GET /articles (비로그인 공개)
 export const getArticles = asyncHandler(async (req, res) => {
-  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const query = req.query as ArticleListQuery;
+  const page = Math.max(parseInt(query.page ?? "") || 1, 1);
   const pageSize = Math.min(
-    Math.max(parseInt(req.query.pageSize) || 10, 1),
+    Math.max(parseInt(query.pageSize ?? "") || 10, 1),
     100,
   );
-  const orderBy = ["recent", "like"].includes(req.query.orderBy)
+  const orderBy = ["recent", "like"].includes(query.orderBy ?? "")
     ? req.query.orderBy
     : "recent";
-  const keyword = (req.query.keyword ?? "").trim().slice(0, 100);
+  const keyword = (query.keyword ?? "").trim().slice(0, 100);
 
   const result = await articleService.getArticles({
     page,
@@ -41,7 +48,10 @@ export const getArticle = asyncHandler(async (req, res) => {
 
 // POST /articles
 export const createArticle = asyncHandler(async (req, res) => {
-  const article = await articleService.createArticle(req.auth.userId, req.body);
+  const article = await articleService.createArticle(
+    req.auth!.userId,
+    req.body,
+  );
   res.status(201).json(article);
 });
 
@@ -50,7 +60,7 @@ export const updateArticle = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
   const article = await articleService.updateArticle(
     id,
-    req.auth.userId,
+    req.auth!.userId,
     req.body,
   );
   res.json(article);
@@ -59,20 +69,20 @@ export const updateArticle = asyncHandler(async (req, res) => {
 // DELETE /articles/:id
 export const deleteArticle = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  await articleService.deleteArticle(id, req.auth.userId);
+  await articleService.deleteArticle(id, req.auth!.userId);
   res.status(204).send();
 });
 
 // POST /articles/:id/like
 export const addLike = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const article = await articleService.addLike(id, req.auth.userId);
+  const article = await articleService.addLike(id, req.auth!.userId);
   res.status(201).json(article);
 });
 
 // DELETE /articles/:id/like
 export const removeLike = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const article = await articleService.removeLike(id, req.auth.userId);
+  const article = await articleService.removeLike(id, req.auth!.userId);
   res.json(article);
 });

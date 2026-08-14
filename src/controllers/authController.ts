@@ -1,5 +1,5 @@
 import * as userService from "../services/userService.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler";
 
 // POST /auth/signUp
 export const signUp = asyncHandler(async (req, res) => {
