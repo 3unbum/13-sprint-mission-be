@@ -26,7 +26,7 @@ export const getArticles = asyncHandler(async (req, res) => {
     100,
   );
   const orderBy = ["recent", "like"].includes(query.orderBy ?? "")
-    ? req.query.orderBy
+    ? query.orderBy
     : "recent";
   const keyword = (query.keyword ?? "").trim().slice(0, 100);
 
