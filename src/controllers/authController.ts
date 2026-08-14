@@ -1,4 +1,4 @@
-import * as userService from "../services/userService.js";
+import * as userService from "../services/userService";
 import asyncHandler from "../middlewares/asyncHandler";
 
 // POST /auth/signUp

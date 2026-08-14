@@ -1,6 +1,6 @@
-import * as commentService from "../services/commentService.js";
+import * as commentService from "../services/commentService";
 import asyncHandler from "../middlewares/asyncHandler";
-import { BadRequestError } from "../types/errors.js";
+import { BadRequestError } from "../types/errors";
 
 // id 값 검증 (라벨만 바꿔 상품/댓글 /cursor에 공용)
 function parseId(value: string | string[] | undefined, label: string): number {
