@@ -1,5 +1,5 @@
 import { Request } from "express";
-import * as productService from "../services/productService.js";
+import * as productService from "../services/productService";
 import asyncHandler from "../middlewares/asyncHandler";
 import { BadRequestError } from "../types/errors";
 

@@ -1,7 +1,7 @@
 import type { Comment, User } from "@prisma/client";
-import * as commentRepository from "../repositories/commentRepository.js";
-import * as productRepository from "../repositories/productRepository.js";
-import * as articleRepository from "../repositories/articleRepository.js";
+import * as commentRepository from "../repositories/commentRepository";
+import * as productRepository from "../repositories/productRepository";
+import * as articleRepository from "../repositories/articleRepository";
 import { NotFoundError, ForbiddenError } from "../types/errors";
 
 // 리포지토리가 include로 붙여주는 작성자 정보 (repository의 writerInclude와 짝)

@@ -2,14 +2,14 @@ import express, { ErrorRequestHandler } from "express";
 import cors from "cors";
 import "dotenv/config";
 import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "./docs/swagger.js";
+import swaggerSpec from "./docs/swagger";
 
-import authRouter from "./routes/authRouter.js";
-import userRouter from "./routes/userRouter.js";
-import productRouter from "./routes/productRouter.js";
-import imageRouter from "./routes/imageRouter.js";
-import commentRouter from "./routes/commentRouter.js";
-import articleRouter from "./routes/articleRouter.js";
+import authRouter from "./routes/authRouter";
+import userRouter from "./routes/userRouter";
+import productRouter from "./routes/productRouter";
+import imageRouter from "./routes/imageRouter";
+import commentRouter from "./routes/commentRouter";
+import articleRouter from "./routes/articleRouter";
 
 const app = express();
 

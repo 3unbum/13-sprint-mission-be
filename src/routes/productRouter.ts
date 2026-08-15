@@ -1,10 +1,10 @@
 import express from "express";
-import * as productController from "../controllers/productController.js";
-import { verifyAccessToken, optionalAuth } from "../middlewares/auth.js";
-import { validateBody } from "../middlewares/validate.js";
-import { CreateProduct, UpdateProduct } from "../structs/productStructs.js";
-import * as commentController from "../controllers/commentController.js";
-import { CreateComment } from "../structs/commentStructs.js";
+import * as productController from "../controllers/productController";
+import { verifyAccessToken, optionalAuth } from "../middlewares/auth";
+import { validateBody } from "../middlewares/validate";
+import { CreateProduct, UpdateProduct } from "../structs/productStructs";
+import * as commentController from "../controllers/commentController";
+import { CreateComment } from "../structs/commentStructs";
 
 const router = express.Router();
 

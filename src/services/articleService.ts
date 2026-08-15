@@ -1,5 +1,5 @@
 import type { Article, User } from "@prisma/client";
-import * as articleRepository from "../repositories/articleRepository.js";
+import * as articleRepository from "../repositories/articleRepository";
 import { NotFoundError, ForbiddenError, ConflictError } from "../types/errors";
 import { Count } from "@prisma/client/runtime/library";
 

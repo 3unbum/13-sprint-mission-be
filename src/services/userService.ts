@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { User } from "@prisma/client";
-import * as userRepository from "../repositories/userRepository.js";
+import * as userRepository from "../repositories/userRepository";
 import {
   ConflictError,
   UnauthorizedError,

@@ -1,4 +1,4 @@
-import * as articleService from "../services/articleService.js";
+import * as articleService from "../services/articleService";
 import asyncHandler from "../middlewares/asyncHandler";
 import { BadRequestError } from "../types/errors";
 

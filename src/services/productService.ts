@@ -1,5 +1,5 @@
 import type { Product, User, Comment } from "@prisma/client";
-import * as productRepository from "../repositories/productRepository.js";
+import * as productRepository from "../repositories/productRepository";
 import { NotFoundError, ForbiddenError, ConflictError } from "../types/errors";
 
 // 상세 조회에만 붙는 댓글 (목록에는 없음)
