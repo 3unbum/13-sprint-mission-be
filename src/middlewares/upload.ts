@@ -1,6 +1,8 @@
-import multer from "multer";
+import multer, { FileFilterCallback } from "multer";
+import type { Request } from "express";
 import path from "path";
 import fs from "fs";
+import { BadRequestError } from "../types/errors";
 
 const UPLOAD_DIR = "uploads";
 fs.mkdirSync(UPLOAD_DIR, { recursive: true }); // 폴더 없으면 생성 (gitignore 대상이라)
@@ -16,11 +18,13 @@ const storage = multer.diskStorage({
 });
 
 // 이미지 mimetype만 허용
-function fileFilter(req, file, cb) {
+function fileFilter(
+  req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+) {
   if (file.mimetype.startsWith("image/")) return cb(null, true);
-  const error = new Error("이미지 파일만 업로드할 수 있어요.");
-  error.status = 400;
-  cb(error);
+  cb(new BadRequestError("이미지 파일만 업로드할 수 있어요."));
 }
 
 export const upload = multer({
