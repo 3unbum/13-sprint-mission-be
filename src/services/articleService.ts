@@ -1,6 +1,7 @@
 import type { Article, User } from "@prisma/client";
 import * as articleRepository from "../repositories/articleRepository.js";
 import { NotFoundError, ForbiddenError, ConflictError } from "../types/errors";
+import { Count } from "@prisma/client/runtime/library";
 
 // 리포지토리가 include로 붙여주는 부가 정보
 // (baseInclude: user + _count / detailInclude: 거기에 내 좋아요만 필터한 likes)
@@ -65,7 +66,9 @@ export async function getArticles({
   keyword,
 }: ArticleListParams): Promise<ArticleListResult> {
   const orderOption =
-    orderBy === "like" ? { likes: { _count: "desc" } } : { createdAt: "desc" };
+    orderBy === "like"
+      ? { likes: { _count: "desc" as const } }
+      : { createdAt: "desc" as const };
 
   const [totalCount, articles] = await articleRepository.findMany({
     skip: (page - 1) * pageSize,
@@ -75,7 +78,7 @@ export async function getArticles({
   });
 
   return {
-    list: (articles as ArticleWithRelations[]).map(toArticleResponse),
+    list: articles.map(toArticleResponse),
     totalCount,
   };
 }
@@ -125,7 +128,7 @@ export async function addLike(
   if (!article) {
     throw new NotFoundError("게시글을 찾을 수 없어요.");
   }
-  if (article.likes.length > 0) {
+  if ((article.likes ?? []).length > 0) {
     throw new ConflictError("이미 좋아요를 누른 게시글이에요.");
   }
   const updated = await articleRepository.addLike(articleId, userId);
@@ -143,7 +146,7 @@ export async function removeLike(
   if (!article) {
     throw new NotFoundError("게시글을 찾을 수 없어요.");
   }
-  if (article.likes.length === 0) {
+  if ((article.likes ?? []).length === 0) {
     throw new ConflictError("좋아요를 누르지 않은 게시글이에요.");
   }
   const updated = await articleRepository.removeLike(articleId, userId);

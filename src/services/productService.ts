@@ -87,8 +87,8 @@ export async function getProducts({
 }: ProductListParams): Promise<ProductListResult> {
   const orderOption =
     orderBy === "favorite"
-      ? { likes: { _count: "desc" } } // 좋아요 많은 순
-      : { createdAt: "desc" }; // 최신순
+      ? { likes: { _count: "desc" as const } } // 좋아요 많은 순
+      : { createdAt: "desc" as const }; // 최신순
 
   const [totalCount, products] = await productRepository.findMany({
     skip: (page - 1) * pageSize,
@@ -98,7 +98,7 @@ export async function getProducts({
   });
 
   return {
-    list: (products as ProductWithRelations[]).map(toProductResponse),
+    list: products.map(toProductResponse),
     totalCount,
   };
 }
@@ -159,7 +159,7 @@ export async function addFavorite(
   if (!product) {
     throw new NotFoundError("상품을 찾을 수 없어요.");
   }
-  if (product.likes.length > 0) {
+  if ((product.likes ?? []).length > 0) {
     throw new ConflictError("이미 좋아요를 누른 상품이에요.");
   }
   const updated = await productRepository.addLike(productId, userId);
@@ -178,7 +178,7 @@ export async function removeFavorite(
   if (!product) {
     throw new NotFoundError("상품을 찾을 수 없어요.");
   }
-  if (product.likes.length === 0) {
+  if ((product.likes ?? []).length === 0) {
     throw new ConflictError("좋아요를 누르지 않은 상품이에요.");
   }
   const updated = await productRepository.removeLike(productId, userId);

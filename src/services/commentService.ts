@@ -63,7 +63,7 @@ export async function getProductComments(
     cursor,
     limit,
   });
-  const list = (comments as CommentWithUser[]).map(toCommentResponse);
+  const list = comments.map(toCommentResponse);
   // limit만큼 꽉 채워 왔으면 다음 페이지가 있을 수 있음 -> 마지막 id가 다음 cursor
   const nextCursor = list.length === limit ? list[list.length - 1].id : null;
   return { list, nextCursor };
@@ -115,7 +115,7 @@ export async function getArticleComments(
     cursor,
     limit,
   });
-  const list = (comments as CommentWithUser[]).map(toCommentResponse);
+  const list = comments.map(toCommentResponse);
   const nextCursor = list.length === limit ? list[list.length - 1].id : null;
   return { list, nextCursor };
 }
