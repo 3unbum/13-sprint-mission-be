@@ -2,7 +2,7 @@
 // swagger-ui-express가 이 객체를 읽어 /docs 페이지를 렌더링한다.
 // ※ 이 파일은 문서 데이터라 Claude가 생성함 (2026-07-05). 엔드포인트가 바뀌면 여기도 갱신할 것.
 
-const errorResponse = (description) => ({
+const errorResponse = (description: string) => ({
   description,
   content: {
     "application/json": {

@@ -1,10 +1,10 @@
 import express from "express";
-import * as productController from "../controllers/productController.js";
-import { verifyAccessToken } from "../middlewares/auth.js";
-import { validateBody } from "../middlewares/validate.js";
-import { CreateProduct, UpdateProduct } from "../structs/productStructs.js";
-import * as commentController from "../controllers/commentController.js";
-import { CreateComment } from "../structs/commentStructs.js";
+import * as productController from "../controllers/productController";
+import { verifyAccessToken, optionalAuth } from "../middlewares/auth";
+import { validateBody } from "../middlewares/validate";
+import { CreateProduct, UpdateProduct } from "../structs/productStructs";
+import * as commentController from "../controllers/commentController";
+import { CreateComment } from "../structs/commentStructs";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router
 
 router
   .route("/:id")
-  .get(verifyAccessToken, productController.getProduct)
+  .get(optionalAuth, productController.getProduct) // 상품 상세는 비로그인도 조회 가능
   .patch(
     verifyAccessToken,
     validateBody(UpdateProduct),
@@ -35,7 +35,7 @@ router
 
 router
   .route("/:id/comments")
-  .get(verifyAccessToken, commentController.getProductComments)
+  .get(commentController.getProductComments) // 댓글 목록은 비로그인도 조회 가능 (게시글과 동일)
   .post(
     verifyAccessToken,
     validateBody(CreateComment),

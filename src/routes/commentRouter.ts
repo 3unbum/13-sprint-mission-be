@@ -1,8 +1,8 @@
 import express from "express";
-import * as commentController from "../controllers/commentController.js";
-import { verifyAccessToken } from "../middlewares/auth.js";
-import { validateBody } from "../middlewares/validate.js";
-import { CreateComment } from "../structs/commentStructs.js";
+import * as commentController from "../controllers/commentController";
+import { verifyAccessToken } from "../middlewares/auth";
+import { validateBody } from "../middlewares/validate";
+import { CreateComment } from "../structs/commentStructs";
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import express from "express";
-import { verifyAccessToken } from "../middlewares/auth.js";
-import { upload } from "../middlewares/upload.js";
-import * as imageController from "../controllers/imageController.js";
+import { verifyAccessToken } from "../middlewares/auth";
+import { upload } from "../middlewares/upload";
+import * as imageController from "../controllers/imageController";
 
 const router = express.Router();
 
