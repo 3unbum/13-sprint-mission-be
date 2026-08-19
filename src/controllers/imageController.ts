@@ -6,9 +6,6 @@ export const uploadImage = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new BadRequestError("이미지 파일을 함께 보내주세요.");
   }
-  // 배포 환경에선 req.get("host")가 내부 호스트로 잡힐 수 있어 환경변수로 고정
-  const baseUrl =
-    process.env.SERVER_URL ?? `${req.protocol}://${req.get("host")}`;
-  const url = `${baseUrl}/uploads/${req.file.filename}`;
-  res.status(201).json({ url });
+  const { location } = req.file as Express.MulterS3.File;
+  res.status(201).json({ url: location });
 });
