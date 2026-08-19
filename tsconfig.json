@@ -10,7 +10,8 @@
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true, // 디버깅용 소스맵 생성
     // "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["jest"]
   },
   "include": ["src/**/*"], // 컴파일 대상 폴더
   "exclude": [
