@@ -1,4 +1,4 @@
-import type { Comment, Prisma, User } from "@prisma/client";
+import type { Comment, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 
 // 작성자 정보는 모든 조회에서 함께 가져옴
@@ -9,9 +9,9 @@ const writerInclude = {
 } satisfies Prisma.CommentInclude;
 
 // 서비스가 쓰는 "작성자 정보가 붙은 댓글" 타입
-export type CommentWithUser = Comment & {
-  user: Pick<User, "id" | "nickname" | "image">;
-};
+export type CommentWithUser = Prisma.CommentGetPayload<{
+  include: typeof writerInclude;
+}>;
 
 interface CursorOptions {
   cursor?: number;
