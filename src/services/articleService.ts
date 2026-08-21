@@ -12,13 +12,34 @@ type ArticleWithRelations = Article & {
   likes?: { id: number }[];
 };
 
-// 프론트로 나가는 형태 (관계 필드를 평탄화해 치환)
-type ArticleResponse = Article & {
+// 프론트로 나가는 형태
+// Prisma 모델을 그대로 쓰지 않고 내보낼 필드만 고른다 (userId 유출 방지)
+type ArticleResponse = Pick<Article, "id" | "title" | "content" | "image"> & {
+  createdAt: string;
+  updatedAt: string;
   ownerId: number;
   nickname: string;
   likeCount: number;
   isLiked: boolean;
 };
+
+// 프론트 기대 형태로 변환 - 상품과 필드명이 다름에 주의
+// (favoriteCount -> likeCount, ownerNickname -> nickname으로 평탄화)
+function toArticleResponse(article: ArticleWithRelations): ArticleResponse {
+  const { user, _count, likes } = article;
+  return {
+    id: article.id,
+    title: article.title,
+    content: article.content,
+    image: article.image,
+    createdAt: article.createdAt.toISOString(),
+    updatedAt: article.updatedAt.toISOString(),
+    ownerId: user.id,
+    nickname: user.nickname,
+    likeCount: _count.likes,
+    isLiked: likes ? likes.length > 0 : false,
+  };
+}
 
 // 목록 조회 파라미터
 interface ArticleListParams {
@@ -34,19 +55,6 @@ type ArticleInput = Pick<Article, "title" | "content">;
 interface ArticleListResult {
   list: ArticleResponse[];
   totalCount: number;
-}
-
-// 프론트 기대 형태로 변환 - 상품과 필드명이 다름에 두의
-// (favoriteCount -> likeCount, ownerNickname -> nickname으로 평탄화)
-function toArticleResponse(article: ArticleWithRelations): ArticleResponse {
-  const { user, _count, likes, ...rest } = article;
-  return {
-    ...rest,
-    ownerId: user.id,
-    nickname: user.nickname,
-    likeCount: _count.likes,
-    isLiked: likes ? likes.length > 0 : false,
-  };
 }
 
 async function checkOwner(id: number, userId: number): Promise<void> {

@@ -18,12 +18,19 @@ type ProductWithRelations = Product & {
 };
 
 // 응답의 댓글 형태 (user -> writer)
-type CommentResponse = Comment & {
+type CommentResponse = Pick<Comment, "id" | "content"> & {
+  createdAt: string;
+  updatedAt: string;
   writer: Pick<User, "id" | "nickname" | "image">;
 };
 
 // 프론트로 나가는 형태 (관계 필드를 평탄화해 치환)
-type ProductResponse = Product & {
+type ProductResponse = Pick<
+  Product,
+  "id" | "name" | "description" | "price" | "tags" | "images"
+> & {
+  createdAt: string;
+  updatedAt: string;
   ownerId: number;
   ownerNickname: string;
   favoriteCount: number;
@@ -52,17 +59,27 @@ type ProductInput = Pick<
 // Prisma 결과를 프론트가 기대하는 형태로 변환
 // (user -> ownerId/ownerNickname, _count.likes -> favoriteCount, likes -> isFavorite)
 function toProductResponse(product: ProductWithRelations): ProductResponse {
-  const { user, _count, likes, comments, ...rest } = product;
+  const { user, _count, likes, comments } = product;
   return {
-    ...rest,
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    tags: product.tags,
+    images: product.images,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
     ownerId: user.id,
     ownerNickname: user.nickname,
     favoriteCount: _count.likes,
     isFavorite: likes ? likes.length > 0 : false,
     ...(comments && {
-      comments: comments.map(({ user: writer, ...c }) => ({
-        ...c,
-        writer,
+      comments: comments.map((c) => ({
+        id: c.id,
+        content: c.content,
+        createdAt: c.createdAt.toISOString(),
+        updatedAt: c.updatedAt.toISOString(),
+        writer: c.user,
       })),
     }),
   };
