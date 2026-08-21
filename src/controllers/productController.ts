@@ -2,6 +2,7 @@ import { Request } from "express";
 import * as productService from "../services/productService";
 import asyncHandler from "../middlewares/asyncHandler";
 import { BadRequestError } from "../types/errors";
+import { getUserId } from "../middlewares/auth";
 
 // :id 파라미터 검증 (숫자가 아니면 400)
 function parseId(params: { id?: string }): number {
@@ -52,7 +53,7 @@ export const getProduct = asyncHandler(async (req, res) => {
 // POST /products
 export const createProduct = asyncHandler(async (req, res) => {
   const product = await productService.createProduct(
-    req.auth!.userId,
+    getUserId(req),
     req.body,
   );
   res.status(201).json(product);
@@ -63,7 +64,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
   const product = await productService.updateProduct(
     id,
-    req.auth!.userId,
+    getUserId(req),
     req.body,
   );
   res.json(product);
@@ -72,20 +73,20 @@ export const updateProduct = asyncHandler(async (req, res) => {
 // DELETE /products/:id
 export const deleteProduct = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  await productService.deleteProduct(id, req.auth!.userId);
+  await productService.deleteProduct(id, getUserId(req));
   res.status(204).send();
 });
 
 // POST /products/:id/favorite
 export const addFavorite = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const product = await productService.addFavorite(id, req.auth!.userId);
+  const product = await productService.addFavorite(id, getUserId(req));
   res.status(201).json(product);
 });
 
 // DELETE /products/:id/favorite
 export const removeFavorite = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const product = await productService.removeFavorite(id, req.auth!.userId);
+  const product = await productService.removeFavorite(id, getUserId(req));
   res.json(product);
 });

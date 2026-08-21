@@ -1,6 +1,7 @@
 import * as articleService from "../services/articleService";
 import asyncHandler from "../middlewares/asyncHandler";
 import { BadRequestError } from "../types/errors";
+import { getUserId } from "../middlewares/auth";
 
 function parseId(params: { id?: string }): number {
   const id = Number(params.id);
@@ -49,7 +50,7 @@ export const getArticle = asyncHandler(async (req, res) => {
 // POST /articles
 export const createArticle = asyncHandler(async (req, res) => {
   const article = await articleService.createArticle(
-    req.auth!.userId,
+    getUserId(req),
     req.body,
   );
   res.status(201).json(article);
@@ -60,7 +61,7 @@ export const updateArticle = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
   const article = await articleService.updateArticle(
     id,
-    req.auth!.userId,
+    getUserId(req),
     req.body,
   );
   res.json(article);
@@ -69,20 +70,20 @@ export const updateArticle = asyncHandler(async (req, res) => {
 // DELETE /articles/:id
 export const deleteArticle = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  await articleService.deleteArticle(id, req.auth!.userId);
+  await articleService.deleteArticle(id, getUserId(req));
   res.status(204).send();
 });
 
 // POST /articles/:id/like
 export const addLike = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const article = await articleService.addLike(id, req.auth!.userId);
+  const article = await articleService.addLike(id, getUserId(req));
   res.status(201).json(article);
 });
 
 // DELETE /articles/:id/like
 export const removeLike = asyncHandler(async (req, res) => {
   const id = parseId(req.params);
-  const article = await articleService.removeLike(id, req.auth!.userId);
+  const article = await articleService.removeLike(id, getUserId(req));
   res.json(article);
 });

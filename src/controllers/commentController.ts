@@ -1,6 +1,7 @@
 import * as commentService from "../services/commentService";
 import asyncHandler from "../middlewares/asyncHandler";
 import { BadRequestError } from "../types/errors";
+import { getUserId } from "../middlewares/auth";
 
 // id 값 검증 (라벨만 바꿔 상품/댓글 /cursor에 공용)
 function parseId(value: string | string[] | undefined, label: string): number {
@@ -37,7 +38,7 @@ export const createProductComment = asyncHandler(async (req, res) => {
   const productId = parseId(req.params.id, "상품 id");
   const comment = await commentService.createProductComment(
     productId,
-    req.auth!.userId,
+    getUserId(req),
     req.body.content,
   );
   res.status(201).json(comment);
@@ -48,7 +49,7 @@ export const updateComment = asyncHandler(async (req, res) => {
   const id = parseId(req.params.id, "댓글 id");
   const comment = await commentService.updateComment(
     id,
-    req.auth!.userId,
+    getUserId(req),
     req.body.content,
   );
   res.json(comment);
@@ -57,7 +58,7 @@ export const updateComment = asyncHandler(async (req, res) => {
 // DELETE /comments/:id
 export const deleteComment = asyncHandler(async (req, res) => {
   const id = parseId(req.params.id, "댓글 id");
-  await commentService.deleteComment(id, req.auth!.userId);
+  await commentService.deleteComment(id, getUserId(req));
   res.status(204).send();
 });
 
@@ -80,7 +81,7 @@ export const createArticleComment = asyncHandler(async (req, res) => {
   const articleId = parseId(req.params.id, "게시글 id");
   const comment = await commentService.createArticleComment(
     articleId,
-    req.auth!.userId,
+    getUserId(req),
     req.body.content,
   );
   res.status(201).json(comment);
